@@ -311,7 +311,7 @@
 .admin-col-title   { min-width: 180px; }
 .admin-col-status  { width: 90px; white-space: nowrap; }
 .admin-col-tags    { width: 160px; }
-.admin-col-date    { width: 110px; white-space: nowrap; }
+.admin-col-date    { width: 145px; white-space: nowrap; }
 .admin-col-actions { width: 200px; white-space: nowrap; }
 
 /* Action buttons group */
