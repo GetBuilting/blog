@@ -444,3 +444,31 @@
         font-size: 12px;
     }
 }
+
+/* ---- Toast notification ---- */
+.toast-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.toast-show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+.toast-success {
+    background: linear-gradient(135deg, #2da44e, #1a7f37);
+}
+.toast-info {
+    background: linear-gradient(135deg, #24292f, #57606a);
+}

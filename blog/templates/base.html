@@ -27,16 +27,11 @@
             <a href="{{ url_for('blog.index') }}" class="Header-link">首页</a>
         </div>
         <div class="Header-item">
-            <a href="{{ url_for('blog.archive') }}" class="Header-link">归档</a>
+            <a href="{{ url_for('blog.archive') }}" class="Header-link">全部博客</a>
         </div>
         <div class="Header-item">
             <a href="{{ url_for('blog.about') }}" class="Header-link">关于</a>
         </div>
-        {% if current_user.is_authenticated %}
-        <div class="Header-item">
-            <a href="{{ url_for('bookmarks.my_bookmarks') }}" class="Header-link">🔖 书签</a>
-        </div>
-        {% endif %}
         {% if current_user.is_authenticated and current_user.is_admin %}
         <div class="Header-item">
             <a href="{{ url_for('admin.dashboard') }}" class="Header-link">⚙ 后台</a>
@@ -46,12 +41,14 @@
             {% if current_user.is_authenticated %}
             <div class="user-menu">
                 <button class="user-menu-trigger" aria-haspopup="true">
-                    <span class="user-avatar">👤</span>
-                    <span class="user-name">{{ current_user.username }}</span>
+                    <span class="user-avatar">{{ current_user.avatar }}</span>
+                    <span class="user-name">{{ current_user.display_name }}</span>
                     <span class="dropdown-caret"></span>
                 </button>
                 <ul class="user-menu-dropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">⚙️ 个人中心</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('my_articles.index') }}">📝 我的文章</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('bookmarks.my_bookmarks') }}">🔖 我的书签</a></li>
                     <li class="dropdown-divider" role="separator"></li>
                     <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">🚪 退出登录</a></li>
                 </ul>
@@ -87,7 +84,7 @@
         </p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=4"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

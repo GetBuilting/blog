@@ -3,22 +3,22 @@
 
 {% block content %}
 <div class="container-md">
-    <h1 class="f1-light mb-3">📂 归档</h1>
+    <h1 class="f1-light mb-3">📚 全部博客</h1>
 
     <!-- Tag filters -->
     {% if all_tags %}
     <div class="mb-4">
         <span class="f5 color-fg-muted mr-2">标签筛选：</span>
         {% if current_tag %}
-        <a href="{{ url_for('blog.archive') }}" class="Label mr-1">全部</a>
+        <a href="{{ url_for('blog.archive') }}" class="Label tag-label mr-1">全部</a>
         {% else %}
-        <span class="Label Label--primary mr-1">全部</span>
+        <span class="Label tag-label-active mr-1">全部</span>
         {% endif %}
         {% for tag in all_tags %}
             {% if tag == current_tag %}
-            <span class="Label Label--primary mr-1">{{ tag }}</span>
+            <span class="Label tag-label-active mr-1">{{ tag }}</span>
             {% else %}
-            <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--secondary mr-1">{{ tag }}</a>
+            <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label tag-label mr-1">{{ tag }}</a>
             {% endif %}
         {% endfor %}
     </div>
@@ -41,10 +41,11 @@
                 {% if article.tag_list %}
                 <span class="ml-3">
                     {% for tag in article.tag_list %}
-                    <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--secondary mr-1">{{ tag }}</a>
+                    <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--success mr-1">{{ tag }}</a>
                     {% endfor %}
                 </span>
                 {% endif %}
+                <span class="ml-3 color-fg-subtle">👤 {{ article.author.display_name if article.author else '—' }}</span>
             </div>
         </div>
     </div>
@@ -92,4 +93,21 @@
     </div>
     {% endif %}
 </div>
+
+<style>
+.tag-label {
+    color: #5a9e3b !important;
+    background-color: #e8f5e0 !important;
+    border-color: #b8d9a6 !important;
+}
+.tag-label:hover {
+    color: #3d7025 !important;
+    background-color: #d0ecc0 !important;
+}
+.tag-label-active {
+    color: #ffffff !important;
+    background-color: #6aaf3d !important;
+    border-color: #5a9e3b !important;
+}
+</style>
 {% endblock %}

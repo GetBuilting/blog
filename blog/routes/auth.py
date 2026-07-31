@@ -74,3 +74,49 @@ def logout():
     logout_user()
     flash('已退出登录。', 'info')
     return redirect(url_for('blog.index'))
+
+
+@auth_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        action = request.form.get('action', '')
+
+        # 修改昵称
+        if action == 'nickname':
+            nickname = request.form.get('nickname', '').strip()
+            if not nickname:
+                flash('昵称不能为空。', 'error')
+            else:
+                current_user.nickname = nickname
+                db.session.commit()
+                flash('昵称修改成功！', 'success')
+
+        # 修改头像
+        elif action == 'avatar':
+            avatar = request.form.get('avatar', '').strip()
+            if avatar:
+                current_user.avatar = avatar
+                db.session.commit()
+                flash('头像修改成功！', 'success')
+
+        # 修改密码
+        elif action == 'password':
+            old_pw = request.form.get('old_password', '')
+            new_pw = request.form.get('new_password', '')
+            new_pw2 = request.form.get('new_password2', '')
+
+            if not current_user.check_password(old_pw):
+                flash('原密码错误。', 'error')
+            elif len(new_pw) < 6:
+                flash('新密码至少 6 个字符。', 'error')
+            elif new_pw != new_pw2:
+                flash('两次新密码输入不一致。', 'error')
+            else:
+                current_user.set_password(new_pw)
+                db.session.commit()
+                flash('密码修改成功！', 'success')
+
+        return redirect(url_for('auth.profile'))
+
+    return render_template('auth/profile.html')

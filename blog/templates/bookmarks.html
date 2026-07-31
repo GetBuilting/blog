@@ -15,11 +15,8 @@
                         {{ article.title }}
                     </a>
                 </h3>
-                <button class="btn btn-sm btn-outline"
-                        data-article-id="{{ article.id }}"
-                        onclick="toggleBookmark(this)">
-                    取消收藏
-                </button>
+                <button type="button" class="btn btn-sm bookmark-btn btn-outline"
+                        data-article-id="{{ article.id }}">取消收藏</button>
             </div>
             {% if article.summary %}
             <p class="color-fg-muted mt-1">{{ article.summary[:200] }}</p>
@@ -73,24 +70,4 @@
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-function toggleBookmark(btn) {
-    const articleId = btn.dataset.articleId;
-    fetch(`/bookmarks/toggle/${articleId}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'removed') {
-                btn.closest('.Box').remove();
-                // Check if no articles left
-                const remaining = document.querySelectorAll('.Box');
-                if (remaining.length === 0) {
-                    location.reload();
-                }
-            }
-        });
-}
-</script>
 {% endblock %}

@@ -96,21 +96,54 @@
     }
 })();
 
-// ---- Bookmark toggle ----
-function toggleBookmark(btn) {
-    var articleId = btn.dataset.articleId;
+// ---- Toast notification ----
+function showToast(message, type) {
+    // Remove existing toast
+    var existing = document.querySelector('.toast-notification');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.className = 'toast-notification toast-' + (type || 'success');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(function() {
+        toast.classList.add('toast-show');
+    });
+
+    // Auto dismiss
+    setTimeout(function() {
+        toast.classList.remove('toast-show');
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 2000);
+}
+
+// ---- Bookmark toggle (event delegation — works with SPA) ----
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.bookmark-btn');
+    if (!btn) return;
+    e.preventDefault();
+
+    var articleId = btn.getAttribute('data-article-id');
     if (!articleId) return;
-    fetch('/bookmarks/toggle/' + articleId, { method: 'POST' })
+
+    fetch('/bookmarks/toggle/' + articleId, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
         .then(function(res) { return res.json(); })
         .then(function(data) {
             if (data.status === 'added') {
                 btn.classList.remove('btn-outline');
                 btn.classList.add('btn-danger');
                 btn.innerHTML = '🔖 已收藏';
+                showToast('✅ 收藏成功', 'success');
             } else if (data.status === 'removed') {
                 btn.classList.remove('btn-danger');
                 btn.classList.add('btn-outline');
                 btn.innerHTML = '🔖 收藏';
+                showToast('已取消收藏', 'info');
                 var box = btn.closest('.Box');
                 if (box) {
                     box.style.opacity = '0';
@@ -120,4 +153,4 @@ function toggleBookmark(btn) {
             }
         })
         .catch(function(err) { console.error('Bookmark toggle failed:', err); });
-}
+});

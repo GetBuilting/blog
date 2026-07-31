@@ -14,6 +14,8 @@ def _generate_slug(title: str, existing_id: int | None = None) -> str:
     slug = re.sub(r'[^\w\s-]', '', title.lower())
     slug = re.sub(r'[\s_]+', '-', slug)
     slug = slug.strip('-')
+    if not slug:
+        slug = 'post-' + __import__('uuid').uuid4().hex[:8]
     base_slug = slug
     counter = 1
     while True:

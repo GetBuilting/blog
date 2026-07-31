@@ -13,7 +13,7 @@
             </a>
             <div class="ae-topbar-info">
                 <h1 class="ae-topbar-title">
-                    {% if article %}编辑文章{% else %}撰写新文章{% endif %}
+                    {% if article %}编辑文章{% else %}写新文章{% endif %}
                 </h1>
                 {% if article %}
                 <div class="ae-topbar-meta">
@@ -315,9 +315,7 @@
     }
 }
 </style>
-{% endblock %}
 
-{% block extra_scripts %}
 <script>
 (function() {
     var textarea = document.getElementById('content');

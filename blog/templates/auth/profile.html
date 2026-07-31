@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}个人中心 - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+
+    <!-- 页头 -->
+    <div class="profile-header">
+        <div class="profile-avatar-preview">{{ current_user.avatar }}</div>
+        <div class="profile-header-info">
+            <h2 class="profile-title">{{ current_user.display_name }}</h2>
+            <p class="profile-subtitle">@{{ current_user.username }} · {{ current_user.email }}</p>
+            <p class="profile-subtitle">注册时间：{{ current_user.created_at.strftime('%Y-%m-%d') }}</p>
+        </div>
+    </div>
+
+    <!-- 三个设置卡片 -->
+    <div class="profile-cards">
+
+        <!-- 修改昵称 -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-icon">✏️</span>
+                <span>修改昵称</span>
+            </div>
+            <div class="profile-card-body">
+                <form method="POST" class="profile-form">
+                    <input type="hidden" name="action" value="nickname">
+                    <input type="text" name="nickname" class="profile-input"
+                           value="{{ current_user.nickname or current_user.username }}"
+                           placeholder="输入新昵称">
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 修改头像 -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-icon">🖼️</span>
+                <span>修改头像</span>
+            </div>
+            <div class="profile-card-body">
+                <p class="profile-hint">点击下方 emoji 选择新头像：</p>
+                <div class="avatar-picker">
+                    {% set avatars = ['👤','😊','😎','🤓','🐱','🐶','🦊','🐼','🐨','🦁','🐸','🐵','🦄','🐙','🌟','🔥','💎','🍀','🎸','🎨','🚀','🌙','⚡','💡','🎯','🧩'] %}
+                    {% for a in avatars %}
+                    <form method="POST" style="display:inline">
+                        <input type="hidden" name="action" value="avatar">
+                        <input type="hidden" name="avatar" value="{{ a }}">
+                        <button type="submit" class="avatar-option {% if current_user.avatar == a %}avatar-active{% endif %}"
+                                title="选择 {{ a }}">{{ a }}</button>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 修改密码 -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-icon">🔒</span>
+                <span>修改密码</span>
+            </div>
+            <div class="profile-card-body">
+                <form method="POST" class="profile-form-vertical">
+                    <input type="hidden" name="action" value="password">
+                    <input type="password" name="old_password" class="profile-input"
+                           placeholder="原密码" required>
+                    <input type="password" name="new_password" class="profile-input"
+                           placeholder="新密码（至少6位）" required minlength="6">
+                    <input type="password" name="new_password2" class="profile-input"
+                           placeholder="确认新密码" required minlength="6">
+                    <button type="submit" class="btn btn-primary btn-sm">修改密码</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+/* ---- Profile header ---- */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.profile-avatar-preview {
+    font-size: 64px;
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f8fa;
+    border-radius: 50%;
+    border: 2px solid #d0d7de;
+    flex-shrink: 0;
+}
+.profile-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #24292f;
+    margin: 0 0 4px 0;
+}
+.profile-subtitle {
+    font-size: 14px;
+    color: #656d76;
+    margin: 0;
+}
+
+/* ---- Cards layout ---- */
+.profile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.profile-card {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.profile-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+    font-size: 14px;
+    font-weight: 600;
+    color: #24292f;
+}
+.profile-card-icon { font-size: 15px; }
+.profile-card-body { padding: 18px; }
+
+/* ---- Forms ---- */
+.profile-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.profile-form .profile-input { flex: 1; }
+.profile-form-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.profile-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1.5px solid #d0d7de;
+    border-radius: 8px;
+    background: #f6f8fa;
+    color: #24292f;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.profile-input:focus {
+    border-color: #0969da;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(9,105,218,0.08);
+}
+.profile-input::placeholder { color: #b0b8c1; }
+.profile-hint {
+    font-size: 13px;
+    color: #656d76;
+    margin: 0 0 10px 0;
+}
+
+/* ---- Avatar picker ---- */
+.avatar-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.avatar-option {
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f8fa;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    padding: 0;
+}
+.avatar-option:hover {
+    background: #ddf4ff;
+    border-color: #0969da;
+    transform: scale(1.1);
+}
+.avatar-active {
+    background: #ddf4ff !important;
+    border-color: #0969da !important;
+    box-shadow: 0 0 0 2px rgba(9,105,218,0.2);
+}
+</style>
+{% endblock %}

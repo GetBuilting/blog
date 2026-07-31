@@ -18,15 +18,14 @@
                     {% endfor %}
                 </span>
                 {% endif %}
+                <span class="ml-3">👤 {{ article.author.display_name if article.author else '—' }}</span>
             </div>
 
             <!-- Bookmark button -->
             {% if current_user.is_authenticated %}
             <div class="mt-2">
-                <button id="bookmark-btn"
-                        class="btn btn-sm {% if current_user.has_bookmarked(article.id) %}btn-danger{% else %}btn-outline{% endif %}"
-                        data-article-id="{{ article.id }}"
-                        onclick="toggleBookmark(this)">
+                <button type="button" class="btn btn-sm bookmark-btn {% if current_user.has_bookmarked(article.id) %}btn-danger{% else %}btn-outline{% endif %}"
+                        data-article-id="{{ article.id }}">
                     {% if current_user.has_bookmarked(article.id) %}
                     🔖 已收藏
                     {% else %}
@@ -60,26 +59,4 @@
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-function toggleBookmark(btn) {
-    const articleId = btn.dataset.articleId;
-    fetch(`/bookmarks/toggle/${articleId}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'added') {
-                btn.classList.remove('btn-outline');
-                btn.classList.add('btn-danger');
-                btn.innerHTML = '🔖 已收藏';
-            } else if (data.status === 'removed') {
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-outline');
-                btn.innerHTML = '🔖 收藏';
-            }
-        })
-        .catch(err => console.error('Bookmark toggle failed:', err));
-}
-</script>
 {% endblock %}
