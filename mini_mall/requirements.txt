@@ -6,3 +6,4 @@ PyGithub==2.6.1
 Markdown==3.7
 python-dotenv==1.0.1
 waitress==3.0.0
+gunicorn==23.0.0
