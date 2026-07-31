@@ -1,107 +1,389 @@
 {% extends "base.html" %}
 {% block title %}{% if article %}编辑文章{% else %}新建文章{% endif %} - 后台 - {{ site_name }}{% endblock %}
 
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
-{% endblock %}
 
 {% block content %}
-<div class="container-md py-4">
-    <div class="admin-page-header">
-        <h1 class="f1-light">
-            {% if article %}✏️ 编辑文章{% else %}✏️ 新建文章{% endif %}
-        </h1>
-        <a href="{{ url_for('admin.articles') }}" class="btn btn-outline">← 返回文章管理</a>
+<div class="article-editor">
+
+    <!-- ====== 顶部状态栏 ====== -->
+    <div class="ae-topbar">
+        <div class="ae-topbar-left">
+            <a href="{{ url_for('admin.articles') }}" class="ae-back-btn" title="返回文章管理">
+                <span class="ae-back-arrow">←</span>
+            </a>
+            <div class="ae-topbar-info">
+                <h1 class="ae-topbar-title">
+                    {% if article %}编辑文章{% else %}撰写新文章{% endif %}
+                </h1>
+                {% if article %}
+                <div class="ae-topbar-meta">
+                    <span class="ae-meta-item">📅 {{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    {% if article.updated_at != article.created_at %}
+                    <span class="ae-meta-divider">·</span>
+                    <span class="ae-meta-item">更新于 {{ article.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    {% endif %}
+                    <span class="ae-meta-divider">·</span>
+                    <span class="ae-status-badge ae-status-{{ article.review_status }}">
+                        {% if article.review_status == 'pending' %}⏳ 待审核
+                        {% elif article.review_status == 'approved' %}✅ 已通过
+                        {% elif article.review_status == 'rejected' %}❌ 已拒绝
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="ae-topbar-right">
+            <a href="{{ url_for('admin.articles') }}" class="btn btn-outline btn-sm">取消</a>
+            <button type="submit" form="article-form" class="btn btn-primary btn-sm">
+                {% if article %}💾 更新文章{% else %}📝 创建文章{% endif %}
+            </button>
+        </div>
     </div>
 
-    <div class="Box mt-3">
-        <div class="Box-body">
-            <form method="POST">
+    <!-- ====== 主编辑区域 ====== -->
+    <form id="article-form" method="POST">
+    <div class="ae-body">
+
+        <!-- ===== 区块1：基本信息卡片 ===== -->
+        <div class="ae-card">
+            <div class="ae-card-header">
+                <span class="ae-card-icon">📋</span>
+                <span class="ae-card-label">基本信息</span>
+            </div>
+            <div class="ae-card-body">
                 <!-- 标题 -->
-                <div class="form-group">
-                    <label for="title" class="form-label">标题 *</label>
-                    <input type="text" id="title" name="title" class="form-control"
-                           value="{{ article.title if article else '' }}" required autofocus>
+                <div class="ae-field">
+                    <label for="title" class="ae-field-label">
+                        标题 <span class="ae-required">*</span>
+                    </label>
+                    <input type="text" id="title" name="title"
+                           class="ae-input ae-input-lg"
+                           value="{{ article.title if article else '' }}"
+                           placeholder="给你的文章起个好标题..."
+                           required autofocus>
                 </div>
 
                 <!-- 标签 + 摘要 -->
-                <div class="d-flex gutter">
-                    <div class="form-group col-6">
-                        <label for="tags" class="form-label">标签</label>
-                        <input type="text" id="tags" name="tags" class="form-control"
+                <div class="ae-row">
+                    <div class="ae-field ae-col">
+                        <label for="tags" class="ae-field-label">🏷️ 标签</label>
+                        <input type="text" id="tags" name="tags"
+                               class="ae-input"
                                value="{{ article.tags if article else '' }}"
-                               placeholder="多个标签用逗号分隔">
+                               placeholder="Python, Flask, Web开发">
+                        <p class="ae-field-hint">多个标签用英文逗号分隔</p>
                     </div>
-                    <div class="form-group col-6">
-                        <label for="summary" class="form-label">摘要</label>
-                        <textarea id="summary" name="summary" class="form-control" rows="2"
-                                  placeholder="留空则自动取正文前200字">{{ article.summary if article else '' }}</textarea>
-                    </div>
-                </div>
-
-                <!-- 正文: 左右分栏 -->
-                <div class="form-group">
-                    <label class="form-label">正文 (Markdown)</label>
-                    <div class="editor-pane">
-                        <div class="editor-left">
-                            <div class="editor-toolbar">
-                                <span class="f6 color-fg-muted">✍️ 编辑</span>
-                            </div>
-                            <textarea id="content" name="content" class="form-control editor-textarea"
-                                      placeholder="使用 Markdown 语法写作...">{{ article.content if article else '' }}</textarea>
-                        </div>
-                        <div class="editor-right">
-                            <div class="editor-toolbar">
-                                <span class="f6 color-fg-muted">👁️ 预览</span>
-                            </div>
-                            <div id="preview" class="markdown-body editor-preview"></div>
-                        </div>
+                    <div class="ae-field ae-col">
+                        <label for="summary" class="ae-field-label">📄 摘要</label>
+                        <textarea id="summary" name="summary"
+                                  class="ae-input ae-textarea-sm"
+                                  placeholder="留空则自动提取正文前200字...">{{ article.summary if article else '' }}</textarea>
                     </div>
                 </div>
 
                 <!-- 发布选项 -->
-                <div class="form-group border-top pt-3">
+                <div class="ae-publish-row">
                     <label class="form-checkbox">
                         <input type="checkbox" name="is_published"
                                {% if article and article.is_published %}checked{% endif %}>
-                        <span class="note">发布文章（勾选后需审核通过才会公开可见）</span>
+                        <span class="note">发布文章（勾选后需管理员审核通过才会公开可见）</span>
                     </label>
                 </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        {% if article %}更新文章{% else %}创建文章{% endif %}
-                    </button>
-                    <a href="{{ url_for('admin.articles') }}" class="btn">取消</a>
-                </div>
-            </form>
+            </div>
         </div>
+
+        <!-- ===== 区块2：正文编辑器 ===== -->
+        <div class="ae-card ae-card-editor">
+            <div class="ae-card-header">
+                <span class="ae-card-icon">✍️</span>
+                <span class="ae-card-label">正文内容</span>
+                <span class="ae-card-badge">Markdown</span>
+                <span class="ae-card-hint">支持 Markdown 语法 · 左右分屏实时预览</span>
+            </div>
+            <div class="ae-card-body ae-card-body-flush">
+                <div class="editor-pane">
+                    <div class="editor-left">
+                        <div class="editor-toolbar">
+                            <span class="f6 color-fg-muted">✍️ 编辑</span>
+                        </div>
+                        <textarea id="content" name="content" class="editor-textarea"
+                                  placeholder="开始用 Markdown 写作... 支持标题、粗体、斜体、代码块、列表、引用等语法">{{ article.content if article else '' }}</textarea>
+                    </div>
+                    <div class="editor-right">
+                        <div class="editor-toolbar">
+                            <span class="f6 color-fg-muted">👁️ 预览</span>
+                        </div>
+                        <div id="preview" class="markdown-body editor-preview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+    </form>
 </div>
+
+<style>
+/* ============================================================
+   Article Editor — 现代化文章编辑器
+   ============================================================ */
+
+/* ---- Wrapper ---- */
+.article-editor {
+    min-height: calc(100vh - 140px);
+    background: #f6f8fa;
+}
+
+/* ---- 顶部状态栏 ---- */
+.ae-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: #ffffff;
+    border-bottom: 1px solid #d0d7de;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.ae-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.ae-back-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    color: #656d76;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+.ae-back-btn:hover {
+    background: #f6f8fa;
+    border-color: #0969da;
+    color: #0969da;
+}
+.ae-topbar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #24292f;
+    margin: 0;
+    line-height: 1.3;
+}
+.ae-topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+}
+.ae-meta-item { font-size: 12px; color: #656d76; }
+.ae-meta-divider { font-size: 12px; color: #d0d7de; }
+.ae-status-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+.ae-status-pending { background: #fff8c5; color: #6e4b07; }
+.ae-status-approved { background: #dafbe1; color: #116329; }
+.ae-status-rejected { background: #ffebe9; color: #a40e26; }
+.ae-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ---- Body layout ---- */
+.ae-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ---- Card ---- */
+.ae-card {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.ae-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+}
+.ae-card-icon { font-size: 15px; }
+.ae-card-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #24292f;
+}
+.ae-card-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    background: #ddf4ff;
+    color: #0969da;
+    border-radius: 10px;
+}
+.ae-card-hint {
+    font-size: 12px;
+    color: #8b949e;
+    margin-left: auto;
+}
+.ae-card-body { padding: 18px; }
+.ae-card-body-flush { padding: 0; }
+
+/* ---- Form fields ---- */
+.ae-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ae-field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #24292f;
+}
+.ae-required { color: #cf222e; font-weight: 700; }
+.ae-field-hint {
+    font-size: 11px;
+    color: #8b949e;
+    margin: 0;
+}
+.ae-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+.ae-col { flex: 1; min-width: 0; }
+
+/* ---- Inputs ---- */
+.ae-input {
+    width: 100%;
+    padding: 10px 13px;
+    font-size: 14px;
+    border: 1.5px solid #d0d7de;
+    border-radius: 8px;
+    background: #f6f8fa;
+    color: #24292f;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+}
+.ae-input:focus {
+    border-color: #0969da;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(9,105,218,0.08);
+}
+.ae-input::placeholder { color: #b0b8c1; }
+.ae-input-lg {
+    font-size: 16px;
+    padding: 13px 15px;
+    font-weight: 500;
+}
+.ae-textarea-sm {
+    min-height: 68px;
+    resize: vertical;
+}
+
+/* ---- 发布选项 ---- */
+.ae-publish-row {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f0;
+}
+.ae-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #24292f;
+}
+
+/* ---- 编辑器卡片特殊处理 ---- */
+.ae-card-editor .editor-pane {
+    border: none;
+    border-radius: 0;
+    min-height: 560px;
+}
+.ae-card-editor .editor-textarea {
+    min-height: 520px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .ae-topbar {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .ae-topbar-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .ae-row {
+        flex-direction: column;
+    }
+    .ae-card-editor .editor-pane {
+        flex-direction: column;
+        min-height: auto;
+    }
+    .ae-card-editor .editor-left {
+        border-right: none;
+        border-bottom: 1px solid #d0d7de;
+    }
+    .ae-card-editor .editor-textarea {
+        min-height: 260px;
+    }
+    .ae-card-editor .editor-preview {
+        min-height: 260px;
+    }
+}
+</style>
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
 <script>
 (function() {
     var textarea = document.getElementById('content');
     var preview = document.getElementById('preview');
-    var timer = null;
+    if (!textarea || !preview) return;
 
     function render() {
         var md = textarea.value;
         if (md.trim()) {
             preview.innerHTML = marked.parse(md);
         } else {
-            preview.innerHTML = '<p class="color-fg-subtle">在左边输入 Markdown，这里实时预览...</p>';
+            preview.innerHTML = '<p style="text-align:center;padding:80px 20px;font-size:14px;color:#8b949e;">📝 在左侧输入 Markdown，这里会实时预览...</p>';
         }
     }
 
+    var timer = null;
     textarea.addEventListener('input', function() {
         clearTimeout(timer);
         timer = setTimeout(render, 200);
     });
 
-    // Initial render
     render();
 })();
 </script>
