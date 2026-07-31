@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ site_description }}">
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/@primer/css@21.5.1/dist/primer.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="site-body">
+    <!-- 动态视频背景 -->
+    <video class="bg-video" autoplay loop muted playsinline preload="auto">
+        <source src="{{ url_for('static', filename='videos/beauty.mp4') }}" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+
+    <!-- Header / Navigation -->
+    <header class="Header">
+        <div class="Header-item Header-item--full">
+            <a href="{{ url_for('blog.index') }}" class="Header-link f4 text-bold color-fg-default">
+                🏠 {{ site_name }}
+            </a>
+        </div>
+        <div class="Header-item">
+            <a href="{{ url_for('blog.index') }}" class="Header-link">首页</a>
+        </div>
+        <div class="Header-item">
+            <a href="{{ url_for('blog.archive') }}" class="Header-link">归档</a>
+        </div>
+        <div class="Header-item">
+            <a href="{{ url_for('blog.about') }}" class="Header-link">关于</a>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div class="Header-item">
+            <a href="{{ url_for('bookmarks.my_bookmarks') }}" class="Header-link">🔖 书签</a>
+        </div>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin %}
+        <div class="Header-item">
+            <a href="{{ url_for('admin.dashboard') }}" class="Header-link">⚙ 后台</a>
+        </div>
+        {% endif %}
+        <div class="Header-item mr-2">
+            {% if current_user.is_authenticated %}
+            <div class="user-menu">
+                <button class="user-menu-trigger" aria-haspopup="true">
+                    <span class="user-avatar">👤</span>
+                    <span class="user-name">{{ current_user.username }}</span>
+                    <span class="dropdown-caret"></span>
+                </button>
+                <ul class="user-menu-dropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('bookmarks.my_bookmarks') }}">🔖 我的书签</a></li>
+                    <li class="dropdown-divider" role="separator"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">🚪 退出登录</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="Header-link">登录</a>
+            <a href="{{ url_for('auth.register') }}" class="Header-link ml-2">注册</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="site-main">
+        <div class="container-lg px-3 py-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash {% if category == 'error' %}flash-error{% elif category == 'success' %}flash-success{% elif category == 'info' %}flash-warn{% else %}flash{% endif %} mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container-lg px-3 py-4 mt-6 border-top">
+        <p class="text-center color-fg-muted f6">
+            © {{ site_name }} · Powered by <a href="https://github.com" target="_blank" rel="noopener">mini_mall</a>
+        </p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

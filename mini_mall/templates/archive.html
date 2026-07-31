@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ site_name }} - 归档{% if current_tag %} · {{ current_tag }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-md">
+    <h1 class="f1-light mb-3">📂 归档</h1>
+
+    <!-- Tag filters -->
+    {% if all_tags %}
+    <div class="mb-4">
+        <span class="f5 color-fg-muted mr-2">标签筛选：</span>
+        {% if current_tag %}
+        <a href="{{ url_for('blog.archive') }}" class="Label mr-1">全部</a>
+        {% else %}
+        <span class="Label Label--primary mr-1">全部</span>
+        {% endif %}
+        {% for tag in all_tags %}
+            {% if tag == current_tag %}
+            <span class="Label Label--primary mr-1">{{ tag }}</span>
+            {% else %}
+            <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--secondary mr-1">{{ tag }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if articles %}
+    {% for article in articles %}
+    <div class="Box mb-3">
+        <div class="Box-body">
+            <h3 class="f3">
+                <a href="{{ url_for('blog.detail', slug=article.slug) }}" class="color-fg-default">
+                    {{ article.title }}
+                </a>
+            </h3>
+            {% if article.summary %}
+            <p class="color-fg-muted">{{ article.summary[:200] }}{% if article.summary|length > 200 %}...{% endif %}</p>
+            {% endif %}
+            <div class="d-flex flex-items-center color-fg-subtle f6 mt-2">
+                <span>📅 {{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% if article.tag_list %}
+                <span class="ml-3">
+                    {% for tag in article.tag_list %}
+                    <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--secondary mr-1">{{ tag }}</a>
+                    {% endfor %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="paginate-container mb-4">
+        <div class="pagination">
+            {% if pagination.has_prev %}
+            <a class="previous_page" rel="prev" href="{{ url_for('blog.archive', page=pagination.prev_num, tag=current_tag) }}">上一页</a>
+            {% else %}
+            <span class="previous_page disabled">上一页</span>
+            {% endif %}
+
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if page_num == pagination.page %}
+                    <em class="current">{{ page_num }}</em>
+                    {% else %}
+                    <a href="{{ url_for('blog.archive', page=page_num, tag=current_tag) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                <span class="gap">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <a class="next_page" rel="next" href="{{ url_for('blog.archive', page=pagination.next_num, tag=current_tag) }}">下一页</a>
+            {% else %}
+            <span class="next_page disabled">下一页</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="blankslate">
+        <h3 class="blankslate-heading">暂无文章</h3>
+        {% if current_tag %}
+        <p>没有找到标签为 "{{ current_tag }}" 的文章。</p>
+        {% else %}
+        <p>博客还没有发布任何文章。</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}用户管理 - 后台 - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+    <div class="admin-page-header">
+        <h1 class="f1-light">👥 用户管理</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline">← 返回后台</a>
+    </div>
+
+    {% if users %}
+    <div class="Box">
+        <div class="Box-body p-0">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th class="admin-col-title">用户名</th>
+                        <th>邮箱</th>
+                        <th class="admin-col-status">角色</th>
+                        <th class="admin-col-date">注册时间</th>
+                        <th class="admin-col-actions">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <strong class="f5">{{ user.username }}</strong>
+                            {% if user.id == current_user.id %}
+                            <span class="Label Label--info ml-1">当前用户</span>
+                            {% endif %}
+                        </td>
+                        <td class="color-fg-muted">{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="Label Label--success">管理员</span>
+                            {% else %}
+                            <span class="Label">普通用户</span>
+                            {% endif %}
+                        </td>
+                        <td class="color-fg-subtle f6">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="admin-actions">
+                            {% if user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('admin.toggle_admin', user_id=user.id) }}">
+                                <button type="submit" class="btn btn-sm {% if user.is_admin %}btn-outline{% else %}btn-primary{% endif %}">
+                                    {% if user.is_admin %}取消管理员{% else %}设为管理员{% endif %}
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="color-fg-subtle f6">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div class="paginate-container mt-3">
+        <div class="pagination">
+            {% if pagination.has_prev %}
+            <a class="previous_page" href="{{ url_for('admin.users', page=pagination.prev_num) }}">上一页</a>
+            {% else %}
+            <span class="previous_page disabled">上一页</span>
+            {% endif %}
+            {% for page_num in pagination.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == pagination.page %}
+                    <em class="current">{{ page_num }}</em>
+                    {% else %}
+                    <a href="{{ url_for('admin.users', page=page_num) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                <span class="gap">...</span>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+            <a class="next_page" href="{{ url_for('admin.users', page=pagination.next_num) }}">下一页</a>
+            {% else %}
+            <span class="next_page disabled">下一页</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="blankslate">
+        <h3 class="blankslate-heading">暂无用户</h3>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}后台管理 - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+    <h1 class="f1-light mb-4">⚙ 后台管理</h1>
+
+    <div class="admin-cards">
+        <div class="admin-card">
+            <div class="admin-card-icon">📄</div>
+            <div class="admin-card-num">{{ article_count }}</div>
+            <div class="admin-card-label">文章总数</div>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-icon">✅</div>
+            <div class="admin-card-num">{{ published_count }}</div>
+            <div class="admin-card-label">已发布</div>
+            <a href="{{ url_for('admin.articles') }}" class="btn btn-sm btn-outline mt-2">管理文章</a>
+        </div>
+        <div class="admin-card {% if pending_count > 0 %}admin-card-warn{% endif %}">
+            <div class="admin-card-icon">⏳</div>
+            <div class="admin-card-num {% if pending_count > 0 %}color-fg-attention{% endif %}">{{ pending_count }}</div>
+            <div class="admin-card-label">待审核 {% if pending_count > 0 %}🔔{% endif %}</div>
+            <a href="{{ url_for('admin.review') }}" class="btn btn-sm {% if pending_count > 0 %}btn-primary{% else %}btn-outline{% endif %} mt-2">审核管理</a>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-icon">👥</div>
+            <div class="admin-card-num">{{ user_count }}</div>
+            <div class="admin-card-label">用户总数</div>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline mt-2">管理用户</a>
+        </div>
+    </div>
+
+    <h2 class="f2-light mb-3 mt-5">快捷操作</h2>
+    <div class="admin-cards admin-cards-2">
+        <a href="{{ url_for('admin.article_new') }}" class="admin-card admin-card-link">
+            <div class="admin-card-icon f1">✏️</div>
+            <div class="admin-card-label">写新文章</div>
+        </a>
+        <a href="{{ url_for('blog.index') }}" target="_blank" class="admin-card admin-card-link">
+            <div class="admin-card-icon f1">👁️</div>
+            <div class="admin-card-label">查看博客前台</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}关于 - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+    <h1 class="f1-light mb-4">🙋 关于</h1>
+
+    <!-- 博客介绍 -->
+    <div class="Box mb-4">
+        <div class="Box-header">
+            <h2 class="Box-title">关于 {{ site_name }}</h2>
+        </div>
+        <div class="Box-body">
+            <p class="f4 color-fg-muted mb-3">{{ site_name }} 是一个微型个人博客，旨在提供简洁、快速的阅读和写作体验。</p>
+        </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="Box mb-4">
+        <div class="Box-header">
+            <h2 class="Box-title">🛠 技术栈</h2>
+        </div>
+        <div class="Box-body">
+            <table class="table-table">
+                <thead>
+                    <tr>
+                        <th>层级</th>
+                        <th>技术</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="Label">后端</span></td>
+                        <td><strong>Python Flask</strong></td>
+                        <td>轻量级 Web 框架</td>
+                    </tr>
+                    <tr>
+                        <td><span class="Label">模板</span></td>
+                        <td><strong>Jinja2</strong></td>
+                        <td>服务端模板渲染</td>
+                    </tr>
+                    <tr>
+                        <td><span class="Label">数据库</span></td>
+                        <td><strong>SQLite</strong></td>
+                        <td>零配置嵌入式数据库</td>
+                    </tr>
+                    <tr>
+                        <td><span class="Label Label--success">样式</span></td>
+                        <td><strong>Primer.css</strong></td>
+                        <td>GitHub 设计系统</td>
+                    </tr>
+                    <tr>
+                        <td><span class="Label Label--success">评论</span></td>
+                        <td><strong>utteranc.es</strong></td>
+                        <td>基于 GitHub Issues</td>
+                    </tr>
+                    <tr>
+                        <td><span class="Label Label--attention">部署</span></td>
+                        <td><strong>GitHub Actions</strong></td>
+                        <td>自动化 CI/CD</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 功能特性 -->
+    <div class="Box mb-4">
+        <div class="Box-header">
+            <h2 class="Box-title">✨ 功能特性</h2>
+        </div>
+        <div class="Box-body">
+            <div class="d-flex flex-wrap">
+                <div class="col-6">
+                    <ul class="list-style-none">
+                        <li class="mb-2">✅ 用户注册与登录</li>
+                        <li class="mb-2">✅ 文章归档、标签筛选</li>
+                        <li class="mb-2">✅ Markdown 写作与代码高亮</li>
+                    </ul>
+                </div>
+                <div class="col-6">
+                    <ul class="list-style-none">
+                        <li class="mb-2">✅ 基于 Issues 的评论系统</li>
+                        <li class="mb-2">✅ 文章书签收藏</li>
+                        <li class="mb-2">✅ 后台管理（文章 + 用户）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于作者 -->
+    <div class="Box mb-4">
+        <div class="Box-header">
+            <h2 class="Box-title">👤 关于作者</h2>
+        </div>
+        <div class="Box-body">
+            <p class="color-fg-muted">欢迎来到我的博客！这里记录了我的技术学习、生活感悟和思考。</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md">
+    <article class="my-4">
+        <header class="mb-4">
+            <h1 class="f00-light">{{ article.title }}</h1>
+            <div class="d-flex flex-items-center color-fg-subtle f5 mt-2">
+                <span>📅 {{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% if article.updated_at and article.updated_at != article.created_at %}
+                <span class="ml-2">(更新于 {{ article.updated_at.strftime('%Y-%m-%d %H:%M') }})</span>
+                {% endif %}
+                {% if article.tag_list %}
+                <span class="ml-3">
+                    {% for tag in article.tag_list %}
+                    <a href="{{ url_for('blog.archive', tag=tag) }}" class="Label Label--secondary mr-1">{{ tag }}</a>
+                    {% endfor %}
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Bookmark button -->
+            {% if current_user.is_authenticated %}
+            <div class="mt-2">
+                <button id="bookmark-btn"
+                        class="btn btn-sm {% if current_user.has_bookmarked(article.id) %}btn-danger{% else %}btn-outline{% endif %}"
+                        data-article-id="{{ article.id }}"
+                        onclick="toggleBookmark(this)">
+                    {% if current_user.has_bookmarked(article.id) %}
+                    🔖 已收藏
+                    {% else %}
+                    🔖 收藏
+                    {% endif %}
+                </button>
+            </div>
+            {% endif %}
+        </header>
+
+        <div class="markdown-body">
+            {{ article_html | safe }}
+        </div>
+    </article>
+
+    <!-- Comments section via utteranc.es -->
+    {% if article.github_issue_number %}
+    <div id="comments" class="my-6">
+        <h2 class="f2-light mb-3 border-bottom pb-2">💬 评论</h2>
+        <script src="https://utteranc.es/client.js"
+                repo="{{ config.GITHUB_REPO }}"
+                issue-number="{{ article.github_issue_number }}"
+                theme="github-light"
+                crossorigin="anonymous"
+                async>
+        </script>
+    </div>
+    {% else %}
+    <div class="my-6">
+        <p class="color-fg-muted text-center">评论功能暂未开启。</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleBookmark(btn) {
+    const articleId = btn.dataset.articleId;
+    fetch(`/bookmarks/toggle/${articleId}`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'added') {
+                btn.classList.remove('btn-outline');
+                btn.classList.add('btn-danger');
+                btn.innerHTML = '🔖 已收藏';
+            } else if (data.status === 'removed') {
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline');
+                btn.innerHTML = '🔖 收藏';
+            }
+        })
+        .catch(err => console.error('Bookmark toggle failed:', err));
+}
+</script>
+{% endblock %}

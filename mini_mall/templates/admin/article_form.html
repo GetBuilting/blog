@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{% if article %}编辑文章{% else %}新建文章{% endif %} - 后台 - {{ site_name }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+    <div class="admin-page-header">
+        <h1 class="f1-light">
+            {% if article %}✏️ 编辑文章{% else %}✏️ 新建文章{% endif %}
+        </h1>
+        <a href="{{ url_for('admin.articles') }}" class="btn btn-outline">← 返回文章管理</a>
+    </div>
+
+    <div class="Box mt-3">
+        <div class="Box-body">
+            <form method="POST">
+                <!-- 标题 -->
+                <div class="form-group">
+                    <label for="title" class="form-label">标题 *</label>
+                    <input type="text" id="title" name="title" class="form-control"
+                           value="{{ article.title if article else '' }}" required autofocus>
+                </div>
+
+                <!-- 标签 + 摘要 -->
+                <div class="d-flex gutter">
+                    <div class="form-group col-6">
+                        <label for="tags" class="form-label">标签</label>
+                        <input type="text" id="tags" name="tags" class="form-control"
+                               value="{{ article.tags if article else '' }}"
+                               placeholder="多个标签用逗号分隔">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="summary" class="form-label">摘要</label>
+                        <textarea id="summary" name="summary" class="form-control" rows="2"
+                                  placeholder="留空则自动取正文前200字">{{ article.summary if article else '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- 正文: 左右分栏 -->
+                <div class="form-group">
+                    <label class="form-label">正文 (Markdown)</label>
+                    <div class="editor-pane">
+                        <div class="editor-left">
+                            <div class="editor-toolbar">
+                                <span class="f6 color-fg-muted">✍️ 编辑</span>
+                            </div>
+                            <textarea id="content" name="content" class="form-control editor-textarea"
+                                      placeholder="使用 Markdown 语法写作...">{{ article.content if article else '' }}</textarea>
+                        </div>
+                        <div class="editor-right">
+                            <div class="editor-toolbar">
+                                <span class="f6 color-fg-muted">👁️ 预览</span>
+                            </div>
+                            <div id="preview" class="markdown-body editor-preview"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 发布选项 -->
+                <div class="form-group border-top pt-3">
+                    <label class="form-checkbox">
+                        <input type="checkbox" name="is_published"
+                               {% if article and article.is_published %}checked{% endif %}>
+                        <span class="note">发布文章（勾选后需审核通过才会公开可见）</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        {% if article %}更新文章{% else %}创建文章{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin.articles') }}" class="btn">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    var textarea = document.getElementById('content');
+    var preview = document.getElementById('preview');
+    var timer = null;
+
+    function render() {
+        var md = textarea.value;
+        if (md.trim()) {
+            preview.innerHTML = marked.parse(md);
+        } else {
+            preview.innerHTML = '<p class="color-fg-subtle">在左边输入 Markdown，这里实时预览...</p>';
+        }
+    }
+
+    textarea.addEventListener('input', function() {
+        clearTimeout(timer);
+        timer = setTimeout(render, 200);
+    });
+
+    // Initial render
+    render();
+})();
+</script>
+{% endblock %}
