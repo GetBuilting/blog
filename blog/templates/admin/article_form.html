@@ -98,8 +98,6 @@
             <div class="ae-card-header">
                 <span class="ae-card-icon">✍️</span>
                 <span class="ae-card-label">正文内容</span>
-                <span class="ae-card-badge">Markdown</span>
-                <span class="ae-card-hint">支持 Markdown 语法 · 左右分屏实时预览</span>
             </div>
             <div class="ae-card-body ae-card-body-flush">
                 <div class="editor-pane">
@@ -362,12 +360,20 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
 <script>
 (function() {
     var textarea = document.getElementById('content');
     var preview = document.getElementById('preview');
     if (!textarea || !preview) return;
+
+    // 确保 marked 已加载
+    function ensureMarked(cb) {
+        if (typeof marked !== 'undefined') { cb(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js';
+        s.onload = cb;
+        document.head.appendChild(s);
+    }
 
     function render() {
         var md = textarea.value;
@@ -384,7 +390,8 @@
         timer = setTimeout(render, 200);
     });
 
-    render();
+    // 首次加载
+    ensureMarked(render);
 })();
 </script>
 {% endblock %}
