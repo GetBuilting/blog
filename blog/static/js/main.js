@@ -19,7 +19,9 @@
             href.startsWith('http') || href.startsWith('//') ||
             link.getAttribute('target') === '_blank' ||
             link.getAttribute('download') ||
-            link.closest('form')) {
+            link.closest('form') ||
+            link.hasAttribute('data-full') ||
+            href.endsWith('/logout')) {
             return;
         }
 
