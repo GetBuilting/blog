@@ -1,4 +1,4 @@
-// mini_mall - main.js
+// blog - main.js
 
 // ---- SPA-like page transition (header + footer stay, content fades) ----
 (function() {

@@ -42,7 +42,7 @@ def create_app(config_name=None):
     @app.context_processor
     def inject_site_config():
         return {
-            'site_name': app.config.get('SITE_NAME', 'mini_mall'),
+            'site_name': app.config.get('SITE_NAME', 'blog'),
             'site_description': app.config.get('SITE_DESCRIPTION', ''),
         }
 
