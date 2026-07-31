@@ -209,48 +209,53 @@
 }
 .photo-card img { cursor: pointer; }
 </style>
-{% endblock %}
 
-{% block extra_scripts %}
+
 <script>
-function switchTab(e, tabId) {
-    e.preventDefault();
-    document.querySelectorAll('.tabnav-tab').forEach(function(t) { t.classList.remove('active'); });
-    e.target.classList.add('active');
-    document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
-    document.getElementById(tabId).style.display = '';
-}
+(function() {
+    window.switchTab = function(e, tabId) {
+        e.preventDefault();
+        document.querySelectorAll('.tabnav-tab').forEach(function(t) { t.classList.remove('active'); });
+        e.target.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
+        document.getElementById(tabId).style.display = '';
+    };
 
-function openLightbox(src, name, time) {
-    document.getElementById('lightboxImg').src = src;
-    document.getElementById('lightboxInfo').textContent = name + ' · ' + time;
-    document.getElementById('lightbox').classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('show');
-    document.body.style.overflow = '';
-}
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
-});
+    window.openLightbox = function(src, name, time) {
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightboxInfo').textContent = name + ' · ' + time;
+        document.getElementById('lightbox').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    };
 
-function previewUpload(input) {
-    var file = input.files[0];
-    var preview = document.getElementById('uploadPreview');
-    var btn = document.getElementById('uploadBtn');
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = '';
-            btn.disabled = false;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        preview.style.display = 'none';
-        btn.disabled = true;
-    }
-}
+    window.closeLightbox = function() {
+        document.getElementById('lightbox').classList.remove('show');
+        document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('lightbox').classList.contains('show')) {
+            closeLightbox();
+        }
+    });
+
+    window.previewUpload = function(input) {
+        var file = input.files[0];
+        var preview = document.getElementById('uploadPreview');
+        var btn = document.getElementById('uploadBtn');
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = '';
+                btn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+            btn.disabled = true;
+        }
+    };
+})();
 </script>
 {% endblock %}
