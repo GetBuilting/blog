@@ -37,12 +37,16 @@ def register():
                 flash(e, 'error')
             return render_template('auth/register.html')
 
-        user = User(username=username, email=email)
+        is_first = User.query.count() == 0
+        user = User(username=username, email=email, is_admin=is_first)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
 
-        flash('注册成功！请登录。', 'success')
+        if is_first:
+            flash('注册成功！你是第一个用户，已自动设为管理员。', 'success')
+        else:
+            flash('注册成功！请登录。', 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')
@@ -76,6 +80,17 @@ def logout():
     logout_user()
     flash('已退出登录。', 'info')
     return redirect(url_for('blog.index'))
+
+
+@auth_bp.route('/first-admin')
+def first_admin():
+    """一次性：设第一个用户为管理员（访问后删除此路由）"""
+    user = User.query.first()
+    if user and not user.is_admin:
+        user.is_admin = True
+        db.session.commit()
+        return f'已设置 {user.username} 为管理员。'
+    return '已是管理员或无用户。'
 
 
 @auth_bp.route('/profile', methods=['GET', 'POST'])
