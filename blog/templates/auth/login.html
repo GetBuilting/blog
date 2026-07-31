@@ -2,33 +2,350 @@
 {% block title %}登录 - {{ site_name }}{% endblock %}
 
 {% block content %}
-<div class="container-sm py-6">
-    <div class="Box">
-        <div class="Box-header">
-            <h2 class="Box-title">🔑 登录</h2>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- 左侧品牌区域 -->
+        <div class="auth-brand">
+            <div class="auth-brand-inner">
+                <div class="auth-brand-icon">🏠</div>
+                <h1 class="auth-brand-title">{{ site_name }}</h1>
+                <p class="auth-brand-desc">{{ site_description }}</p>
+                <div class="auth-brand-divider"></div>
+                <p class="auth-brand-sub">欢迎回来，登录以继续</p>
+            </div>
         </div>
-        <div class="Box-body">
-            <form method="POST" action="{{ url_for('auth.login') }}">
-                <div class="form-group">
-                    <label for="username" class="form-label">用户名</label>
-                    <input type="text" id="username" name="username" class="form-control" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">密码</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-checkbox">
-                        <input type="checkbox" name="remember">
-                        <span class="note">记住我</span>
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">登录</button>
-            </form>
-        </div>
-        <div class="Box-footer text-center">
-            <p class="color-fg-muted">还没有账号？<a href="{{ url_for('auth.register') }}">立即注册</a></p>
+
+        <!-- 右侧表单区域 -->
+        <div class="auth-form-side">
+            <div class="auth-form-inner">
+                <h2 class="auth-form-title">🔑 登录</h2>
+                <p class="auth-form-subtitle">登录你的账号，开始阅读</p>
+
+                <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
+                    <div class="auth-field">
+                        <label for="username" class="auth-label">
+                            <span class="auth-label-icon">👤</span> 用户名
+                        </label>
+                        <input type="text" id="username" name="username"
+                               class="auth-input"
+                               placeholder="请输入用户名"
+                               required autofocus>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="password" class="auth-label">
+                            <span class="auth-label-icon">🔒</span> 密码
+                        </label>
+                        <input type="password" id="password" name="password"
+                               class="auth-input"
+                               placeholder="请输入密码"
+                               required>
+                    </div>
+
+                    <div class="auth-options">
+                        <label class="auth-checkbox">
+                            <input type="checkbox" name="remember">
+                            <span class="auth-checkbox-mark"></span>
+                            <span class="auth-checkbox-text">记住我</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="auth-submit">
+                        <span>登 录</span>
+                        <span class="auth-submit-arrow">→</span>
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    还没有账号？<a href="{{ url_for('auth.register') }}">立即注册 →</a>
+                </p>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+/* ---- Auth page layout ---- */
+.auth-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 140px);
+    padding: 24px 16px;
+}
+
+/* ---- Card container ---- */
+.auth-card {
+    display: flex;
+    width: 100%;
+    max-width: 860px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow:
+        0 4px 6px rgba(0,0,0,0.04),
+        0 10px 30px rgba(0,0,0,0.08),
+        0 20px 60px rgba(0,0,0,0.06);
+    overflow: hidden;
+    animation: authCardIn 0.5s ease;
+}
+@keyframes authCardIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---- Brand side (left) ---- */
+.auth-brand {
+    width: 42%;
+    background: linear-gradient(135deg, #24292f 0%, #2d3748 50%, #1a1a2e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+.auth-brand::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+.auth-brand-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 28px;
+}
+.auth-brand-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+.auth-brand-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+.auth-brand-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    margin: 0;
+    line-height: 1.5;
+}
+.auth-brand-divider {
+    width: 40px;
+    height: 3px;
+    background: rgba(255,255,255,0.25);
+    margin: 20px auto;
+    border-radius: 2px;
+}
+.auth-brand-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin: 0;
+}
+
+/* ---- Form side (right) ---- */
+.auth-form-side {
+    width: 58%;
+    background: #ffffff;
+}
+.auth-form-inner {
+    padding: 48px 40px;
+}
+.auth-form-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #24292f;
+    margin: 0 0 6px 0;
+}
+.auth-form-subtitle {
+    font-size: 14px;
+    color: #656d76;
+    margin: 0 0 28px 0;
+}
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* ---- Form fields ---- */
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.auth-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #24292f;
+    letter-spacing: 0.3px;
+}
+.auth-label-icon {
+    font-size: 13px;
+}
+.auth-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    border: 2px solid #d0d7de;
+    border-radius: 10px;
+    background: #f6f8fa;
+    color: #24292f;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    outline: none;
+}
+.auth-input:focus {
+    border-color: #0969da;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(9,105,218,0.1);
+}
+.auth-input::placeholder {
+    color: #b0b8c1;
+}
+
+/* ---- Checkbox ---- */
+.auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.auth-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+.auth-checkbox input[type="checkbox"] {
+    display: none;
+}
+.auth-checkbox-mark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d0d7de;
+    border-radius: 4px;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.auth-checkbox input:checked + .auth-checkbox-mark {
+    background: #0969da;
+    border-color: #0969da;
+}
+.auth-checkbox-mark::after {
+    content: '';
+    display: none;
+    width: 5px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin: 2px auto 0;
+}
+.auth-checkbox input:checked + .auth-checkbox-mark::after {
+    display: block;
+}
+.auth-checkbox-text {
+    font-size: 14px;
+    color: #656d76;
+}
+
+/* ---- Submit button ---- */
+.auth-submit {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2d3748, #1a1a2e);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 2px;
+    transition: all 0.25s ease;
+    margin-top: 4px;
+}
+.auth-submit:hover {
+    background: linear-gradient(135deg, #0969da, #0550ae);
+    box-shadow: 0 4px 16px rgba(9,105,218,0.3);
+    transform: translateY(-1px);
+}
+.auth-submit:active {
+    transform: translateY(0);
+}
+.auth-submit-arrow {
+    transition: transform 0.25s ease;
+}
+.auth-submit:hover .auth-submit-arrow {
+    transform: translateX(3px);
+}
+
+/* ---- Switch link ---- */
+.auth-switch {
+    text-align: center;
+    margin: 24px 0 0 0;
+    font-size: 14px;
+    color: #656d76;
+}
+.auth-switch a {
+    color: #0969da;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.auth-switch a:hover {
+    color: #0550ae;
+    text-decoration: underline;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 700px) {
+    .auth-card {
+        flex-direction: column;
+        max-width: 420px;
+    }
+    .auth-brand {
+        width: 100%;
+        padding: 28px 20px;
+    }
+    .auth-brand-inner {
+        padding: 20px 16px;
+    }
+    .auth-brand-icon {
+        font-size: 40px;
+        margin-bottom: 8px;
+    }
+    .auth-brand-title {
+        font-size: 22px;
+    }
+    .auth-brand-desc {
+        font-size: 13px;
+    }
+    .auth-brand-divider {
+        margin: 12px auto;
+    }
+    .auth-brand-sub {
+        font-size: 12px;
+    }
+    .auth-form-side {
+        width: 100%;
+    }
+    .auth-form-inner {
+        padding: 32px 24px;
+    }
+}
+</style>
 {% endblock %}
