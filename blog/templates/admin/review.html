@@ -19,6 +19,7 @@
                         <th class="admin-col-title">标题</th>
                         <th class="admin-col-status">审核状态</th>
                         <th class="admin-col-tags">标签</th>
+                        <th>发布者</th>
                         <th class="admin-col-date">日期</th>
                         <th class="admin-col-actions">操作</th>
                     </tr>
@@ -43,6 +44,7 @@
                             <span class="Label Label--secondary mr-1">{{ tag }}</span>
                             {% endfor %}
                         </td>
+                        <td class="color-fg-subtle f6" style="white-space:nowrap">{{ article.author.username if article.author else '—' }}</td>
                         <td class="color-fg-subtle f6">{{ article.created_at.strftime('%Y-%m-%d') }}</td>
                         <td class="admin-actions">
                             {% if article.review_status in ('pending', 'rejected') %}
