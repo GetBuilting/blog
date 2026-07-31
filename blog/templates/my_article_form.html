@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}{% if article %}编辑文章{% else %}写文章{% endif %} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="article-editor">
+
+    <div class="ae-topbar">
+        <div class="ae-topbar-left">
+            <a href="{{ url_for('my_articles.index') }}" class="ae-back-btn" title="返回我的文章">
+                <span class="ae-back-arrow">←</span>
+            </a>
+            <h1 class="ae-topbar-title">
+                {% if article %}编辑文章{% else %}写新文章{% endif %}
+            </h1>
+        </div>
+        <div class="ae-topbar-right">
+            <a href="{{ url_for('my_articles.index') }}" class="btn btn-outline btn-sm">取消</a>
+            <button type="submit" form="article-form" class="btn btn-primary btn-sm">
+                {% if article %}💾 更新文章{% else %}📝 发布文章{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <form id="article-form" method="POST">
+    <div class="ae-body">
+
+        <div class="ae-card">
+            <div class="ae-card-header">
+                <span class="ae-card-icon">📋</span>
+                <span class="ae-card-label">基本信息</span>
+            </div>
+            <div class="ae-card-body">
+                <div class="ae-field">
+                    <label for="title" class="ae-field-label">
+                        标题 <span class="ae-required">*</span>
+                    </label>
+                    <input type="text" id="title" name="title" class="ae-input ae-input-lg"
+                           value="{{ article.title if article else '' }}"
+                           placeholder="给你的文章起个好标题..."
+                           required autofocus>
+                </div>
+                <div class="ae-row">
+                    <div class="ae-field ae-col">
+                        <label for="tags" class="ae-field-label">🏷️ 标签</label>
+                        <input type="text" id="tags" name="tags" class="ae-input"
+                               value="{{ article.tags if article else '' }}"
+                               placeholder="Python, Flask, Web开发">
+                        <p class="ae-field-hint">多个标签用英文逗号分隔</p>
+                    </div>
+                    <div class="ae-field ae-col">
+                        <label for="summary" class="ae-field-label">📄 摘要</label>
+                        <textarea id="summary" name="summary" class="ae-input ae-textarea-sm"
+                                  placeholder="留空则自动提取正文前200字...">{{ article.summary if article else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ae-card ae-card-editor">
+            <div class="ae-card-header">
+                <span class="ae-card-icon">✍️</span>
+                <span class="ae-card-label">正文内容</span>
+            </div>
+            <div class="ae-card-body ae-card-body-flush">
+                <div class="editor-pane">
+                    <div class="editor-left">
+                        <textarea id="content" name="content" class="editor-textarea"
+                                  placeholder="开始用 Markdown 写作...">{{ article.content if article else '' }}</textarea>
+                    </div>
+                    <div class="editor-right">
+                        <div id="preview" class="markdown-body editor-preview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </form>
+</div>
+
+<style>
+.article-editor { min-height: calc(100vh - 140px); background: #f6f8fa; }
+
+.ae-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px; background: #ffffff;
+    border-bottom: 1px solid #d0d7de;
+    position: sticky; top: 0; z-index: 10;
+}
+.ae-topbar-left { display: flex; align-items: center; gap: 14px; }
+.ae-back-btn {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #d0d7de; border-radius: 8px;
+    color: #656d76; text-decoration: none; font-size: 16px;
+    transition: all 0.15s; flex-shrink: 0;
+}
+.ae-back-btn:hover { background: #f6f8fa; border-color: #0969da; color: #0969da; }
+.ae-topbar-title { font-size: 18px; font-weight: 600; color: #24292f; margin: 0; }
+.ae-topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.ae-body {
+    max-width: 1200px; margin: 0 auto; padding: 20px 24px 40px;
+    display: flex; flex-direction: column; gap: 20px;
+}
+
+.ae-card {
+    background: #ffffff; border: 1px solid #d0d7de;
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.ae-card-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 18px; background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+}
+.ae-card-icon { font-size: 15px; }
+.ae-card-label { font-size: 13px; font-weight: 600; color: #24292f; }
+.ae-card-body { padding: 18px; }
+.ae-card-body-flush { padding: 0; }
+
+.ae-field { display: flex; flex-direction: column; gap: 6px; }
+.ae-field-label { font-size: 13px; font-weight: 600; color: #24292f; }
+.ae-required { color: #cf222e; font-weight: 700; }
+.ae-field-hint { font-size: 11px; color: #8b949e; margin: 0; }
+.ae-row { display: flex; gap: 16px; margin-top: 16px; }
+.ae-col { flex: 1; min-width: 0; }
+
+.ae-input {
+    width: 100%; padding: 10px 13px; font-size: 14px;
+    border: 1.5px solid #d0d7de; border-radius: 8px;
+    background: #f6f8fa; color: #24292f;
+    transition: all 0.2s; box-sizing: border-box;
+    outline: none; font-family: inherit;
+}
+.ae-input:focus {
+    border-color: #0969da; background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(9,105,218,0.08);
+}
+.ae-input::placeholder { color: #b0b8c1; }
+.ae-input-lg { font-size: 16px; padding: 13px 15px; font-weight: 500; }
+.ae-textarea-sm { min-height: 68px; resize: vertical; }
+
+.ae-card-editor .editor-pane { border: none; border-radius: 0; min-height: 560px; }
+.ae-card-editor .editor-textarea { min-height: 520px; }
+
+@media (max-width: 768px) {
+    .ae-topbar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+    .ae-topbar-right { width: 100%; justify-content: flex-end; }
+    .ae-row { flex-direction: column; }
+    .ae-card-editor .editor-pane { flex-direction: column; min-height: auto; }
+    .ae-card-editor .editor-left { border-right: none; border-bottom: 1px solid #d0d7de; }
+    .ae-card-editor .editor-textarea { min-height: 260px; }
+    .ae-card-editor .editor-preview { min-height: 260px; }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    var textarea = document.getElementById('content');
+    var preview = document.getElementById('preview');
+    if (!textarea || !preview) return;
+
+    function ensureMarked(cb) {
+        if (typeof marked !== 'undefined') { cb(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js';
+        s.onload = cb;
+        document.head.appendChild(s);
+    }
+
+    function render() {
+        var md = textarea.value;
+        if (md.trim()) {
+            preview.innerHTML = marked.parse(md);
+        } else {
+            preview.innerHTML = '<p style="text-align:center;padding:80px 20px;font-size:14px;color:#8b949e;">📝 在左侧输入 Markdown，这里会实时预览...</p>';
+        }
+    }
+
+    var timer = null;
+    textarea.addEventListener('input', function() {
+        clearTimeout(timer);
+        timer = setTimeout(render, 200);
+    });
+
+    ensureMarked(render);
+})();
+</script>
+{% endblock %}

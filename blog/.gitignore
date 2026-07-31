@@ -27,7 +27,7 @@ Thumbs.db
 .env
 
 # Large media files (videos)
-static/videos/
+#static/videos/
 
 # Claude
 .claude/

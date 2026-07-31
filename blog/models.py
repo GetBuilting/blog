@@ -18,6 +18,8 @@ class User(UserMixin, db.Model):
 
     bookmarks = db.relationship('Bookmark', backref='user', lazy='dynamic',
                                 cascade='all, delete-orphan')
+    articles = db.relationship('Article', backref='author', lazy='dynamic',
+                               foreign_keys='Article.author_id')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -43,6 +45,7 @@ class Article(db.Model):
     tags = db.Column(db.String(256), default='')  # comma-separated
     is_published = db.Column(db.Boolean, default=False)
     review_status = db.Column(db.String(16), default='pending')  # pending / approved / rejected
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     github_issue_number = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),

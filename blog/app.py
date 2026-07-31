@@ -30,11 +30,13 @@ def create_app(config_name=None):
     from routes.blog import blog_bp
     from routes.bookmarks import bookmarks_bp
     from routes.admin import admin_bp
+    from routes.my_articles import my_articles_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(blog_bp)
     app.register_blueprint(bookmarks_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(my_articles_bp)
 
     # Register context processors
     from flask import g

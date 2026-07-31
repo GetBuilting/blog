@@ -82,14 +82,6 @@
                     </div>
                 </div>
 
-                <!-- 发布选项 -->
-                <div class="ae-publish-row">
-                    <label class="form-checkbox">
-                        <input type="checkbox" name="is_published"
-                               {% if article and article.is_published %}checked{% endif %}>
-                        <span class="note">发布文章（勾选后需管理员审核通过才会公开可见）</span>
-                    </label>
-                </div>
             </div>
         </div>
 
@@ -102,16 +94,10 @@
             <div class="ae-card-body ae-card-body-flush">
                 <div class="editor-pane">
                     <div class="editor-left">
-                        <div class="editor-toolbar">
-                            <span class="f6 color-fg-muted">✍️ 编辑</span>
-                        </div>
                         <textarea id="content" name="content" class="editor-textarea"
                                   placeholder="开始用 Markdown 写作... 支持标题、粗体、斜体、代码块、列表、引用等语法">{{ article.content if article else '' }}</textarea>
                     </div>
                     <div class="editor-right">
-                        <div class="editor-toolbar">
-                            <span class="f6 color-fg-muted">👁️ 预览</span>
-                        </div>
                         <div id="preview" class="markdown-body editor-preview"></div>
                     </div>
                 </div>
@@ -232,19 +218,6 @@
     font-weight: 600;
     color: #24292f;
 }
-.ae-card-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    background: #ddf4ff;
-    color: #0969da;
-    border-radius: 10px;
-}
-.ae-card-hint {
-    font-size: 12px;
-    color: #8b949e;
-    margin-left: auto;
-}
 .ae-card-body { padding: 18px; }
 .ae-card-body-flush { padding: 0; }
 
@@ -300,21 +273,6 @@
 .ae-textarea-sm {
     min-height: 68px;
     resize: vertical;
-}
-
-/* ---- 发布选项 ---- */
-.ae-publish-row {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid #f0f0f0;
-}
-.ae-checkbox-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #24292f;
 }
 
 /* ---- 编辑器卡片特殊处理 ---- */

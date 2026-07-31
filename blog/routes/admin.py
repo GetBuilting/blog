@@ -122,7 +122,7 @@ def article_new():
             return render_template('admin/article_form.html', article=None)
 
         create_article(title=title, content=content, tags=tags, summary=summary,
-                       is_published=is_published)
+                       is_published=is_published, author_id=current_user.id)
         flash('文章创建成功！发布后需审核通过才会公开可见。', 'success')
         return redirect(url_for('admin.articles'))
 

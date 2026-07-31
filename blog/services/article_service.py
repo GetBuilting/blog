@@ -34,7 +34,7 @@ def _generate_slug(title: str, existing_id: int | None = None) -> str:
 
 
 def create_article(title: str, content: str, tags: str, summary: str,
-                   is_published: bool, **kwargs) -> Article:
+                   is_published: bool, author_id: int = None, **kwargs) -> Article:
     """Create an article. Starts with review_status='pending'."""
     slug = _generate_slug(title)
     article = Article(
@@ -45,6 +45,7 @@ def create_article(title: str, content: str, tags: str, summary: str,
         tags=tags,
         is_published=is_published,
         review_status='pending',
+        author_id=author_id,
     )
     db.session.add(article)
     db.session.commit()
