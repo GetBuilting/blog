@@ -50,7 +50,7 @@
                         <td class="color-fg-subtle f6">{{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                         <td class="admin-actions">
                             <a href="{{ url_for('my_articles.edit', article_id=article.id) }}" class="btn btn-sm btn-outline">编辑</a>
-                            <form method="POST" action="{{ url_for('my_articles.delete', article_id=article.id) }}" onsubmit="return confirm('确定删除这篇文章？');">
+                            <form method="POST" action="{{ url_for('my_articles.delete', article_id=article.id) }}" class="confirm-form" data-confirm="确定删除这篇文章？" data-icon="🗑️" data-ok="删除">
                                 <button type="submit" class="btn btn-sm btn-danger">删除</button>
                             </form>
                         </td>

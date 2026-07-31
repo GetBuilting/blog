@@ -472,3 +472,68 @@
 .toast-info {
     background: linear-gradient(135deg, #24292f, #57606a);
 }
+
+/* ---- Confirm modal ---- */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.2s ease;
+}
+.confirm-modal.show { display: flex; }
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.confirm-dialog {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px 28px 20px;
+    text-align: center;
+    min-width: 320px;
+    max-width: 420px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    transform: scale(0.9);
+    animation: modalScaleIn 0.25s ease forwards;
+}
+@keyframes modalScaleIn { to { transform: scale(1); } }
+.confirm-icon { font-size: 40px; margin-bottom: 12px; }
+.confirm-message {
+    font-size: 15px;
+    color: #24292f;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.confirm-actions .btn {
+    min-width: 80px;
+    transition: all 0.25s ease;
+    padding: 6px 16px;
+    border-radius: 8px;
+}
+.confirm-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(106,175,61,0.25);
+}
+.confirm-actions .btn:active {
+    transform: translateY(0);
+}
+.confirm-actions .btn-outline:hover {
+    background: #e8f5e0;
+    border-color: #8bc34a;
+    color: #5a9e3b;
+}
+.confirm-actions .btn-danger:hover {
+    background: #e8f5e0;
+    border-color: #8bc34a;
+    color: #5a9e3b;
+}
+.confirm-actions .btn-primary:hover {
+    background: #6aaf3d;
+    border-color: #6aaf3d;
+}

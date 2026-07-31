@@ -41,11 +41,20 @@
                 </div>
                 <div class="ae-row">
                     <div class="ae-field ae-col">
-                        <label for="tags" class="ae-field-label">🏷️ 标签</label>
+                        <label for="tag_select" class="ae-field-label">🏷️ 标签</label>
+                        {% set preset_tags = ['代码', '生活', '游戏', '娱乐', '书籍分享', '其他'] %}
+                        {% set current_tags = (article.tags if article else '') %}
+                        {% set is_custom = current_tags not in preset_tags and current_tags != '' %}
+                        <select id="tag_select" class="ae-input" onchange="toggleTagInput()">
+                            <option value="">选择标签...</option>
+                            {% for t in preset_tags %}
+                            <option value="{{ t }}" {% if current_tags == t %}selected{% endif %}>{{ t }}</option>
+                            {% endfor %}
+                        </select>
                         <input type="text" id="tags" name="tags" class="ae-input"
-                               value="{{ article.tags if article else '' }}"
-                               placeholder="Python, Flask, Web开发">
-                        <p class="ae-field-hint">多个标签用英文逗号分隔</p>
+                               placeholder="输入自定义标签"
+                               value="{{ current_tags if is_custom else '' }}"
+                               style="{% if not is_custom %}display:none{% endif %};margin-top:6px">
                     </div>
                     <div class="ae-field ae-col">
                         <label for="summary" class="ae-field-label">📄 摘要</label>
@@ -64,6 +73,14 @@
             <div class="ae-card-body ae-card-body-flush">
                 <div class="editor-pane">
                     <div class="editor-left">
+                        <div class="editor-toolbar" style="display:flex;align-items:center;gap:6px">
+                            <span class="f6 color-fg-muted" style="margin-right:auto">✍️ 编辑</span>
+                            <label class="btn btn-sm btn-outline" style="cursor:pointer;margin:0">
+                                🖼️ 插入图片
+                                <input type="file" accept="image/*" style="display:none"
+                                       onchange="uploadImage(this)">
+                            </label>
+                        </div>
                         <textarea id="content" name="content" class="editor-textarea"
                                   placeholder="开始用 Markdown 写作...">{{ article.content if article else '' }}</textarea>
                     </div>
@@ -187,5 +204,56 @@
 
     ensureMarked(render);
 })();
+
+// 图片上传
+function uploadImage(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('图片不能超过10MB'); return; }
+
+    var btn = input.parentElement;
+    var origText = btn.textContent;
+    btn.textContent = '⏳ 上传中...';
+    btn.style.pointerEvents = 'none';
+
+    var formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/admin/upload-image', { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.error) { alert(data.error); return; }
+            var textarea = document.getElementById('content');
+            var md = '![](' + data.url + ')';
+            var pos = textarea.selectionStart;
+            textarea.value = textarea.value.slice(0, pos) + md + textarea.value.slice(pos);
+            textarea.focus();
+            textarea.selectionEnd = pos + md.length;
+            textarea.dispatchEvent(new Event('input'));
+        })
+        .catch(function() { alert('上传失败，请重试'); })
+        .finally(function() {
+            btn.textContent = origText;
+            btn.style.pointerEvents = '';
+            input.value = '';
+        });
+}
+
+// 标签下拉切换
+function toggleTagInput() {
+    var select = document.getElementById('tag_select');
+    var input = document.getElementById('tags');
+    if (select.value === '其他') {
+        input.style.display = '';
+        input.value = '';
+        input.focus();
+    } else if (select.value) {
+        input.style.display = 'none';
+        input.value = select.value;
+    } else {
+        input.style.display = 'none';
+        input.value = '';
+    }
+}
 </script>
 {% endblock %}

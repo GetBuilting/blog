@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}个人相册 - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-md py-4">
+    <div class="admin-page-header">
+        <h1 class="f1-light">🖼️ 个人相册</h1>
+        <a href="{{ url_for('auth.profile') }}" class="btn btn-outline">← 返回个人中心</a>
+    </div>
+
+    <!-- 标签导航 -->
+    <div class="tabnav mb-3">
+        <nav class="tabnav-tabs">
+            <a href="#tab-count" class="tabnav-tab active" onclick="switchTab(event,'tab-count')">📊 相片数量</a>
+            <a href="#tab-manage" class="tabnav-tab" onclick="switchTab(event,'tab-manage')">📋 相片管理</a>
+            <a href="#tab-upload" class="tabnav-tab" onclick="switchTab(event,'tab-upload')">➕ 新增图片</a>
+        </nav>
+    </div>
+
+    <!-- 标签1: 相片数量 -->
+    <div id="tab-count" class="tab-panel">
+        <div class="Box">
+            <div class="Box-body text-center py-6">
+                <div style="font-size:64px">🖼️</div>
+                <div style="font-size:48px;font-weight:300;color:#24292f;margin:12px 0">{{ photos|length }}</div>
+                <p class="color-fg-muted">当前相册共有 <strong>{{ photos|length }}</strong> 张图片</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 标签2: 相片管理 -->
+    <div id="tab-manage" class="tab-panel" style="display:none">
+        {% if photos %}
+        <div class="photo-grid">
+            {% for photo in photos %}
+            <div class="photo-card">
+                <img src="{{ url_for('static', filename='uploads/photos/' + photo.filename) }}"
+                     alt="{{ photo.original_name or photo.filename }}" loading="lazy"
+                     onclick="openLightbox(this.src, '{{ photo.original_name or photo.filename }}', '{{ photo.created_at.strftime('%Y-%m-%d %H:%M') }}')">
+                <div class="photo-card-footer">
+                    <span class="f6 color-fg-muted">{{ photo.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <form method="POST" action="{{ url_for('auth.album_delete', photo_id=photo.id) }}"
+                          class="confirm-form" data-confirm="确定删除这张图片吗？" data-icon="🗑️" data-ok="删除">
+                        <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="blankslate">
+            <h3 class="blankslate-heading">暂无图片</h3>
+            <p>去"新增图片"上传你的第一张照片吧！</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 标签3: 新增图片 -->
+    <div id="tab-upload" class="tab-panel" style="display:none">
+        {% if photos|length >= 10 %}
+        <div class="flash flash-warn">
+            ⚠️ 相册已满！最多上传 10 张图片（当前 {{ photos|length }}/10）。请先删除旧图片再上传。
+        </div>
+        {% else %}
+        <form method="POST" action="{{ url_for('auth.album_upload') }}" enctype="multipart/form-data">
+            <label class="upload-zone" id="uploadZone">
+                <input type="file" name="photo" accept="image/*" required
+                       onchange="previewUpload(this)" style="display:none">
+                <div class="upload-zone-icon">📤</div>
+                <div class="upload-zone-text">点击此区域选择图片</div>
+                <div class="upload-zone-hint">支持 png / jpg / jpeg / gif / webp · 还可上传 {{ 10 - (photos|length) }} 张</div>
+                <img id="uploadPreview" class="upload-preview" style="display:none" alt="预览">
+            </label>
+            <button type="submit" class="btn btn-primary mt-3" id="uploadBtn" disabled>📤 上传图片</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- 灯箱 -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImg" class="lightbox-img">
+        <div id="lightboxInfo" class="lightbox-info"></div>
+    </div>
+</div>
+
+<style>
+/* ---- Tab navigation ---- */
+.tabnav { border-bottom: 1px solid #d0d7de; }
+.tabnav-tabs {
+    display: flex; gap: 0; list-style: none; padding: 0; margin: 0;
+}
+.tabnav-tab {
+    display: inline-block;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #656d76;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+    cursor: pointer;
+}
+.tabnav-tab:hover { color: #24292f; border-bottom-color: #d0d7de; }
+.tabnav-tab.active {
+    color: #0969da;
+    border-bottom-color: #0969da;
+    font-weight: 600;
+}
+.tab-panel { animation: tabFadeIn 0.25s ease; }
+@keyframes tabFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---- Photo grid ---- */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+}
+.photo-card {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+.photo-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.photo-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+.photo-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: #f6f8fa;
+}
+
+/* ---- Upload zone ---- */
+.upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 44px 20px;
+    border: 2px dashed #d0d7de;
+    border-radius: 12px;
+    background: #f6f8fa;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    min-height: 200px;
+}
+.upload-zone:hover {
+    border-color: #0969da;
+    background: #f0f6ff;
+}
+.upload-zone-icon { font-size: 48px; margin-bottom: 12px; }
+.upload-zone-text { font-size: 16px; font-weight: 600; color: #24292f; }
+.upload-zone-hint { font-size: 13px; color: #656d76; margin-top: 6px; }
+.upload-preview {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+/* ---- Lightbox ---- */
+.lightbox {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: lbFadeIn 0.2s ease;
+}
+.lightbox.show { display: flex; }
+@keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 75vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    cursor: default;
+}
+.lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    font-size: 36px;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 10000;
+    line-height: 1;
+    transition: opacity 0.15s;
+}
+.lightbox-close:hover { opacity: 0.7; }
+.lightbox-info {
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+}
+.photo-card img { cursor: pointer; }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchTab(e, tabId) {
+    e.preventDefault();
+    document.querySelectorAll('.tabnav-tab').forEach(function(t) { t.classList.remove('active'); });
+    e.target.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
+    document.getElementById(tabId).style.display = '';
+}
+
+function openLightbox(src, name, time) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxInfo').textContent = name + ' · ' + time;
+    document.getElementById('lightbox').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('show');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+
+function previewUpload(input) {
+    var file = input.files[0];
+    var preview = document.getElementById('uploadPreview');
+    var btn = document.getElementById('uploadBtn');
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = '';
+            btn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+        btn.disabled = true;
+    }
+}
+</script>
+{% endblock %}

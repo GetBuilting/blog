@@ -29,5 +29,9 @@ Thumbs.db
 # Large media files (videos)
 #static/videos/
 
+# Uploaded images
+static/uploads/*
+!static/uploads/.gitkeep
+
 # Claude
 .claude/

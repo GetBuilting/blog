@@ -55,7 +55,7 @@
                         <td class="admin-actions">
                             <a href="{{ url_for('admin.article_edit', article_id=article.id) }}" class="btn btn-sm">编辑</a>
                             <form method="POST" action="{{ url_for('admin.article_delete', article_id=article.id) }}"
-                                  onsubmit="return confirm('确定删除「{{ article.title }}」吗？此操作不可撤销。')">
+                                  class="confirm-form" data-confirm="确定删除「{{ article.title }}」？此操作不可撤销。" data-icon="🗑️" data-ok="删除">
                                 <button type="submit" class="btn btn-sm btn-danger">删除</button>
                             </form>
                         </td>

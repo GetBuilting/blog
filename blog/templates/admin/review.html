@@ -47,17 +47,25 @@
                         <td class="color-fg-subtle f6" style="white-space:nowrap">{{ article.author.username if article.author else '—' }}</td>
                         <td class="color-fg-subtle f6">{{ article.created_at.strftime('%Y-%m-%d') }}</td>
                         <td class="admin-actions">
-                            {% if article.review_status in ('pending', 'rejected') %}
+                            {% if article.review_status == 'pending' %}
                             <form method="POST" action="{{ url_for('admin.review_approve', article_id=article.id) }}"
-                                  onsubmit="return confirm('确定通过「{{ article.title }}」的审核吗？')">
+                                  class="confirm-form" data-confirm="确定通过「{{ article.title }}」的审核吗？" data-icon="✅" data-ok="通过" data-ok-class="btn-primary">
                                 <button type="submit" class="btn btn-sm btn-primary">✅ 通过</button>
                             </form>
                             <form method="POST" action="{{ url_for('admin.review_reject', article_id=article.id) }}"
-                                  onsubmit="return confirm('确定拒绝「{{ article.title }}」吗？')">
+                                  class="confirm-form" data-confirm="确定拒绝「{{ article.title }}」吗？" data-icon="❌" data-ok="拒绝">
                                 <button type="submit" class="btn btn-sm btn-danger">❌ 拒绝</button>
                             </form>
-                            {% else %}
-                            <span class="color-fg-subtle f6">—</span>
+                            {% elif article.review_status == 'rejected' %}
+                            <form method="POST" action="{{ url_for('admin.review_approve', article_id=article.id) }}"
+                                  class="confirm-form" data-confirm="确定通过「{{ article.title }}」的审核吗？" data-icon="✅" data-ok="通过" data-ok-class="btn-primary">
+                                <button type="submit" class="btn btn-sm btn-primary">✅ 通过</button>
+                            </form>
+                            {% elif article.review_status == 'approved' %}
+                            <form method="POST" action="{{ url_for('admin.review_reject', article_id=article.id) }}"
+                                  class="confirm-form" data-confirm="确定驳回「{{ article.title }}」的审核吗？" data-icon="↩️" data-ok="驳回">
+                                <button type="submit" class="btn btn-sm btn-danger">↩️ 驳回审核</button>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>

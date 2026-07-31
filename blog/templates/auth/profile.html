@@ -12,6 +12,9 @@
             <p class="profile-subtitle">@{{ current_user.username }} · {{ current_user.email }}</p>
             <p class="profile-subtitle">注册时间：{{ current_user.created_at.strftime('%Y-%m-%d') }}</p>
         </div>
+        <a href="{{ url_for('auth.album') }}" class="btn btn-outline profile-album-btn">
+            🖼️ 个人相册
+        </a>
     </div>
 
     <!-- 三个设置卡片 -->
@@ -114,6 +117,17 @@
     font-size: 14px;
     color: #656d76;
     margin: 0;
+}
+.profile-album-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 10px 18px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.profile-album-btn:hover {
+    background: #ddf4ff;
+    border-color: #0969da;
 }
 
 /* ---- Cards layout ---- */

@@ -96,6 +96,48 @@
     }
 })();
 
+// ---- Confirm form interceptor ----
+document.addEventListener('submit', function(e) {
+    var form = e.target.closest('.confirm-form');
+    if (!form) return;
+    e.preventDefault();
+    var msg = form.getAttribute('data-confirm') || '确定执行此操作？';
+    var icon = form.getAttribute('data-icon') || '⚠️';
+    var okText = form.getAttribute('data-ok') || '确认';
+    var okClass = form.getAttribute('data-ok-class') || 'btn-danger';
+    showConfirm(msg, icon, okText, okClass, function(confirmed) {
+        if (confirmed) form.submit();
+    });
+});
+
+// ---- Confirm modal ----
+function showConfirm(message, icon, okText, okClass, callback) {
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmIcon').textContent = icon || '⚠️';
+    var okBtn = document.getElementById('confirmOk');
+    okBtn.textContent = okText || '确认';
+    okBtn.className = 'btn btn-sm ' + (okClass || 'btn-danger');
+    document.getElementById('confirmModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    function cleanup() {
+        document.getElementById('confirmModal').classList.remove('show');
+        document.body.style.overflow = '';
+        document.getElementById('confirmOk').onclick = null;
+        document.getElementById('confirmCancel').onclick = null;
+        document.getElementById('confirmModal').onclick = null;
+    }
+
+    document.getElementById('confirmOk').onclick = function() { cleanup(); if (callback) callback(true); };
+    document.getElementById('confirmCancel').onclick = function() { cleanup(); if (callback) callback(false); };
+    document.getElementById('confirmModal').onclick = function(e) {
+        if (e.target === document.getElementById('confirmModal')) { cleanup(); if (callback) callback(false); }
+    };
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') { cleanup(); if (callback) callback(false); document.removeEventListener('keydown', escHandler); }
+    });
+}
+
 // ---- Toast notification ----
 function showToast(message, type) {
     // Remove existing toast

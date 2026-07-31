@@ -96,9 +96,10 @@ def edit(article_id):
         article.content = content
         article.summary = summary or content[:200]
         article.tags = tags
+        article.review_status = 'pending'
         article.updated_at = datetime.now(timezone.utc)
         db.session.commit()
-        flash('文章更新成功！', 'success')
+        flash('文章更新成功！需重新审核通过后才会公开显示。', 'success')
         return redirect(url_for('my_articles.index'))
 
     return render_template('my_article_form.html', article=article)

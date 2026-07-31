@@ -1,5 +1,7 @@
+import os
+import uuid
 from functools import wraps
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from models import db, Article, User
 from services.github_service import GitHubService
@@ -204,3 +206,29 @@ def toggle_admin(user_id):
     status = '管理员' if user.is_admin else '普通用户'
     flash(f'用户 {user.username} 已被设为 {status}。', 'success')
     return redirect(url_for('admin.users'))
+
+
+# ---- Image Upload (for Markdown editor) ----
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@admin_bp.route('/upload-image', methods=['POST'])
+@login_required
+def upload_image():
+    file = request.files.get('image')
+    if not file or file.filename == '':
+        return jsonify({'error': '未选择文件'}), 400
+    if not allowed_file(file.filename):
+        return jsonify({'error': '仅支持 png/jpg/jpeg/gif/webp 格式'}), 400
+
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = f'{uuid.uuid4().hex}.{ext}'
+    upload_dir = os.path.join(current_app.static_folder, 'uploads')
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, filename)
+    file.save(filepath)
+
+    url = url_for('static', filename=f'uploads/{filename}')
+    return jsonify({'url': url})

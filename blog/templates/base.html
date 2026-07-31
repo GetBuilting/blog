@@ -84,7 +84,19 @@
         </p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=4"></script>
+    <!-- 自定义确认弹窗 -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-dialog">
+            <div id="confirmIcon" class="confirm-icon">⚠️</div>
+            <div id="confirmMessage" class="confirm-message"></div>
+            <div class="confirm-actions">
+                <button id="confirmCancel" class="btn btn-outline btn-sm">取消</button>
+                <button id="confirmOk" class="btn btn-danger btn-sm">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=5"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

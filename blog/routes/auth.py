@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+import os
+import uuid
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User
+from models import db, User, Photo
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -120,3 +122,60 @@ def profile():
         return redirect(url_for('auth.profile'))
 
     return render_template('auth/profile.html')
+
+
+@auth_bp.route('/album')
+@login_required
+def album():
+    photos = current_user.photos.order_by(Photo.created_at.desc()).all()
+    return render_template('auth/album.html', photos=photos)
+
+
+@auth_bp.route('/album/upload', methods=['POST'])
+@login_required
+def album_upload():
+    # 检查限额
+    count = current_user.photos.count()
+    if count >= 10:
+        flash('相册已满！最多上传 10 张图片，请先删除旧图片。', 'error')
+        return redirect(url_for('auth.album'))
+
+    file = request.files.get('photo')
+    if not file or file.filename == '':
+        flash('请选择图片。', 'error')
+        return redirect(url_for('auth.album'))
+
+    ext = file.filename.rsplit('.', 1)[-1].lower()
+    if ext not in ('png', 'jpg', 'jpeg', 'gif', 'webp'):
+        flash('仅支持 png/jpg/jpeg/gif/webp 格式。', 'error')
+        return redirect(url_for('auth.album'))
+
+    filename = f'{uuid.uuid4().hex}.{ext}'
+    upload_dir = os.path.join(current_app.static_folder, 'uploads', 'photos')
+    os.makedirs(upload_dir, exist_ok=True)
+    file.save(os.path.join(upload_dir, filename))
+
+    photo = Photo(user_id=current_user.id, filename=filename, original_name=file.filename)
+    db.session.add(photo)
+    db.session.commit()
+    flash('图片上传成功！', 'success')
+    return redirect(url_for('auth.album'))
+
+
+@auth_bp.route('/album/delete/<int:photo_id>', methods=['POST'])
+@login_required
+def album_delete(photo_id):
+    photo = db.session.get(Photo, photo_id)
+    if not photo or photo.user_id != current_user.id:
+        flash('图片不存在。', 'error')
+        return redirect(url_for('auth.album'))
+
+    # Delete file
+    filepath = os.path.join(current_app.static_folder, 'uploads', 'photos', photo.filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
+    db.session.delete(photo)
+    db.session.commit()
+    flash('图片已删除。', 'info')
+    return redirect(url_for('auth.album'))

@@ -58,13 +58,14 @@ def update_article(article: Article, title: str, content: str, tags: str,
                    summary: str, is_published: bool,
                    gh_service: GitHubService,
                    article_base_url: str = '') -> Article:
-    """Update an article. Syncs GitHub Issue only if already approved."""
+    """Update an article. Resets to pending review."""
     article.title = title
     article.slug = _generate_slug(title, existing_id=article.id)
     article.content = content
     article.summary = summary or content[:200]
     article.tags = tags
     article.is_published = is_published
+    article.review_status = 'pending'
     article.updated_at = datetime.now(timezone.utc)
 
     if article.review_status == 'approved' and article.github_issue_number and gh_service.is_configured():
