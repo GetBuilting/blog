@@ -44,7 +44,7 @@ def create_article(title: str, content: str, tags: str, summary: str,
         summary=summary or content[:200],
         tags=tags,
         is_published=is_published,
-        review_status='pending',
+        review_status='approved',
         author_id=author_id,
     )
     db.session.add(article)

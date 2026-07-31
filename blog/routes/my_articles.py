@@ -60,7 +60,7 @@ def new():
             summary=summary or content[:200],
             tags=tags,
             is_published=True,
-            review_status='approved',
+            review_status='pending',
             author_id=current_user.id,
         )
         db.session.add(article)
