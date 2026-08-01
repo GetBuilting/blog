@@ -45,7 +45,7 @@
                     {% endfor %}
                 </span>
                 {% endif %}
-                <span class="ml-3 color-fg-subtle">👤 {{ article.author.display_name if article.author else '—' }}</span>
+                <span class="ml-3 color-fg-subtle">{{ article.author.avatar if article.author else '👤' }} {{ article.author.display_name if article.author else '—' }}</span>
             </div>
         </div>
     </div>

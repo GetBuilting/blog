@@ -18,7 +18,7 @@
                     {% endfor %}
                 </span>
                 {% endif %}
-                <span class="ml-3">👤 {{ article.author.display_name if article.author else '—' }}</span>
+                <span class="ml-3">{{ article.author.avatar if article.author else '👤' }} {{ article.author.display_name if article.author else '—' }}</span>
             </div>
 
             <!-- Bookmark button -->
